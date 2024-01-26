@@ -90,6 +90,7 @@ int main() {
 
 		shader.use();
 		shader.setMat4("_ViewProjection", camera.projectionMatrix() * camera.viewMatrix());
+		shader.setFloat("_Time", glfwGetTime());
 		monkeyModel.draw(); //Draws monkey model using current shader
 
 		drawUI(&camera, &cameraController);
