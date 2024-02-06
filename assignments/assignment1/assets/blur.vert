@@ -2,10 +2,16 @@
 
 out vec2 UV;
 
+vec4 vertices[3] = 
+{
+    vec4(-1, -1, 0, 0), //bottom left (X,Y,U,V)
+    vec4(3, -1, 2, 0), //bottom right
+    vec4(-1, 3, 0, 2) //top left
+};
+
 void main()
 {
-    float u = (((uint(gl_VertexID)+2u) / 3u) % 2u);
-    float v = (((uint(gl_VertexID)+1u) / 3u) % 2u);
-    UV = vec2(u,v);
-    gl_Position = vec4(-1.0+u*2.0,-1.0+v*2.0,0.0,1.0);
+    UV = vertices[gl_VertexID].zw;
+
+    gl_Position = vec4(vertices[gl_VertexID].xy, 0, 1);
 }

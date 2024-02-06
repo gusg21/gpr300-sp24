@@ -8,7 +8,7 @@ in Surface{
 }fs_in;
 
 uniform sampler2D _MainTex; 
-uniform sampler2D _NormalMapTex; 
+//uniform sampler2D _NormalMapTex; 
 uniform vec3 _EyePos;
 uniform vec3 _LightDirection = vec3(0.0,-1.0,0.0);
 uniform vec3 _LightColor = vec3(1.0);
@@ -25,8 +25,7 @@ uniform float _Time;
 
 void main(){
 	//Make sure fragment normal is still length 1 after interpolation.
-	vec3 normal = texture(_NormalMapTex, fs_in.TexCoord).rgb;
-	normal = normal * 2.0 - 1.0;
+	vec3 normal = fs_in.WorldNormal;
 	//Light pointing straight down
 	vec3 toLight = fs_in.TBN * -_LightDirection;
 	float diffuseFactor = max(dot(normal,toLight),0.0);

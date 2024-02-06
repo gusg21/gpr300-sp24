@@ -9,12 +9,12 @@ namespace gg {
 			framebuffer buffer = {0};
 
 			//Create Framebuffer Object
-			glCreateFramebuffers(1, &buffer.fbo);
+			glGenFramebuffers(1, &buffer.fbo);
 			glBindFramebuffer(GL_FRAMEBUFFER, buffer.fbo);
 			//Create 8 bit RGBA color buffer
 			glGenTextures(1, &buffer.colorBuffer);
 			glBindTexture(GL_TEXTURE_2D, buffer.colorBuffer);
-			glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+			glTexStorage2D(GL_TEXTURE_2D, 1, colorFormat, width, height);
 			//Attach color buffer to framebuffer
 			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, buffer.colorBuffer, 0);
 
