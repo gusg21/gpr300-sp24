@@ -18,12 +18,15 @@ namespace gg {
 			//Attach color buffer to framebuffer
 			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, buffer.colorBuffer, 0);
 
+			buffer.width = width;
+			buffer.height = height;
+
 			glGenTextures(1, &buffer.depthBuffer);
 			glBindTexture(GL_TEXTURE_2D, buffer.depthBuffer);
 			//Create 16 bit depth buffer - must be same width/height of color buffer
 			glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT16, width, height);
 			//Attach to framebuffer (assuming FBO is bound)
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, buffer.depthBuffer, 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, buffer.depthBuffer, 0);
 		
 			/*glGenRenderbuffers(1, &buffer->rbo);
 			glBindRenderbuffer(GL_RENDERBUFFER, buffer->rbo);

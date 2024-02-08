@@ -35,6 +35,8 @@ int screenHeight = 720;
 float prevFrameTime;
 float deltaTime;
 
+float dofIntensity = 200.f, dofBlur = 20.0f, dofOffset = 0.55f, fogPower = 500.f;
+
 ew::Transform monkeyTransform;
 
 ew::Camera camera;
@@ -77,7 +79,7 @@ int main() {
 
 		gg::fb::Bind(&fb);
 		glViewport(0, 0, fb.width, fb.height);
-		glClearColor(0.7f, 0.3f, 0.9f, 1.0f);
+		glClearColor(0.f, 0.f, 0.f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST); //Depth testing
 
@@ -105,8 +107,15 @@ int main() {
 
 		ppShader.use();
 		ppShader.setInt("_ColorBuffer", 0);
+		ppShader.setInt("_DepthBuffer", 1);
+		ppShader.setVec2("_BufferSize", glm::vec2(fb.width, fb.height));
+		ppShader.setFloat("_DofIntensity", dofIntensity);
+		ppShader.setFloat("_DofOffset", dofOffset);
+		ppShader.setFloat("_DofBlur", dofBlur);
+		ppShader.setFloat("_FogPower", fogPower);
 
 		glBindTextureUnit(0, fb.colorBuffer);
+		glBindTextureUnit(1, fb.depthBuffer);
 		glBindVertexArray(dummyVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -134,6 +143,12 @@ void drawUI(ew::Camera *cam, ew::CameraController *camCtrl) {
 		ImGui::SliderFloat("DiffuseK", &material.Kd, 0.0f, 1.0f);
 		ImGui::SliderFloat("SpecularK", &material.Ks, 0.0f, 1.0f);
 		ImGui::SliderFloat("Shininess", &material.Shininess, 2.0f, 1024.0f);
+	}
+	if (ImGui::CollapsingHeader("Effect")) {
+		ImGui::SliderFloat("DOF Intensity", &dofIntensity, 0.0f, 500.0f);
+		ImGui::SliderFloat("DOF Offset", &dofOffset, 0.0f, 1.0f);
+		ImGui::SliderFloat("DOF Blur", &dofBlur, 0.0f, 50.0f);
+		ImGui::SliderFloat("Fog Power", &fogPower, 1.0f, 1000.f);
 	}
 
 	//Add more camera settings here!
