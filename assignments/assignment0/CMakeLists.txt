@@ -15,9 +15,9 @@ ${CMAKE_CURRENT_SOURCE_DIR}/assets/
 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/)
 
 install(FILES ${ASSIGNMENT0_INC} DESTINATION include/assignment0)
-add_executable(assignment0 ${ASSIGNMENT0_SRC} ${ASSIGNMENT0_INC})
-target_link_libraries(assignment0 PUBLIC core IMGUI assimp)
-target_include_directories(assignment0 PUBLIC ${CORE_INC_DIR} ${stb_INCLUDE_DIR})
+add_executable(assignment2 ${ASSIGNMENT0_SRC} ${ASSIGNMENT0_INC})
+target_link_libraries(assignment2 PUBLIC core IMGUI assimp)
+target_include_directories(assignment2 PUBLIC ${CORE_INC_DIR} ${stb_INCLUDE_DIR})
 
 #Trigger asset copy when assignment0 is built
-add_dependencies(assignment0 copyAssetsA0)
+add_dependencies(assignment2 copyAssetsA0)
