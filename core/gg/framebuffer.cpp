@@ -41,6 +41,39 @@ namespace gg {
 			return buffer;
 		}
 
+		framebuffer CreateDepthOnly(uint32_t width, uint32_t height)
+		{
+			framebuffer buffer = { 0 };
+
+			buffer.width = width;
+			buffer.height = height;
+
+			//Create Framebuffer Object
+			glGenFramebuffers(1, &buffer.fbo);
+			glBindFramebuffer(GL_FRAMEBUFFER, buffer.fbo);
+
+			glGenTextures(1, &buffer.depthBuffer);
+			glBindTexture(GL_TEXTURE_2D, buffer.depthBuffer);
+			//Create 16 bit depth buffer - must be same width/height of color buffer
+			glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT16, width, height);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			//Pixels outside of frustum should have max distance (white)
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			float borderColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+			//Attach to framebuffer (assuming FBO is bound)
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, buffer.depthBuffer, 0);
+
+			GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
+				printf("Framebuffer incomplete: %d", fboStatus);
+			}
+
+			return buffer;
+		}
+
 		void Destroy(framebuffer* buffer) {
 
 		}

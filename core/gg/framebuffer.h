@@ -14,6 +14,7 @@ namespace gg {
 		};
 
 		framebuffer Create(uint32_t width, uint32_t height, int32_t colorFormat);
+		framebuffer CreateDepthOnly(uint32_t width, uint32_t height);
 		void Destroy(framebuffer* buffer);
 		void Bind(framebuffer* buffer);
 	};
