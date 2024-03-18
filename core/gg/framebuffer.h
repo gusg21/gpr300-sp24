@@ -4,8 +4,7 @@
 #include "../ew/shader.h"
 
 namespace gg {
-	namespace fb {
-		struct framebuffer {
+		struct FrameBuffer {
 			uint32_t fbo;
 			uint32_t colorBuffer;
 			uint32_t depthBuffer;
@@ -13,9 +12,8 @@ namespace gg {
 			uint32_t height;
 		};
 
-		framebuffer Create(uint32_t width, uint32_t height, int32_t colorFormat);
-		framebuffer CreateDepthOnly(uint32_t width, uint32_t height);
-		void Destroy(framebuffer* buffer);
-		void Bind(framebuffer* buffer);
+		FrameBuffer CreateFrameBuffer(uint32_t width, uint32_t height, int32_t colorFormat);
+		FrameBuffer CreateFrameBufferDepthOnly(uint32_t width, uint32_t height);
+		void DestroyFrameBuffer(FrameBuffer* buffer);
+		void BindFrameBuffer(FrameBuffer* buffer);
 	};
-};

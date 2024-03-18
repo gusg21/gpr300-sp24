@@ -4,9 +4,8 @@
 #include "framebuffer.h"
 
 namespace gg {
-	namespace fb {
-		framebuffer Create(uint32_t width, uint32_t height, int32_t colorFormat) {
-			framebuffer buffer = {0};
+		FrameBuffer CreateFrameBuffer(uint32_t width, uint32_t height, int32_t colorFormat) {
+			FrameBuffer buffer = {0};
 
 			//Create Framebuffer Object
 			glGenFramebuffers(1, &buffer.fbo);
@@ -41,9 +40,9 @@ namespace gg {
 			return buffer;
 		}
 
-		framebuffer CreateDepthOnly(uint32_t width, uint32_t height)
+		FrameBuffer CreateFrameBufferDepthOnly(uint32_t width, uint32_t height)
 		{
-			framebuffer buffer = { 0 };
+			FrameBuffer buffer = { 0 };
 
 			buffer.width = width;
 			buffer.height = height;
@@ -74,12 +73,11 @@ namespace gg {
 			return buffer;
 		}
 
-		void Destroy(framebuffer* buffer) {
+		void DestroyFrameBuffer(FrameBuffer* buffer) {
 
 		}
 
-		void Bind(framebuffer* buffer) {
+		void BindFrameBuffer(FrameBuffer* buffer) {
 			glBindFramebuffer(GL_FRAMEBUFFER, buffer->fbo);
 		}
 	}
-}
