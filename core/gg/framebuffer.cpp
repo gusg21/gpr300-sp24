@@ -159,7 +159,7 @@ namespace gg {
 
 	}
 
-	void BindFrameBuffer(FrameBuffer* buffer) {
-		glBindFramebuffer(GL_FRAMEBUFFER, buffer->fbo);
+	void BindFrameBuffer(const FrameBuffer& buffer) {
+		glBindFramebuffer(GL_FRAMEBUFFER, buffer.fbo);
 	}
 }

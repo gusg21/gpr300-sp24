@@ -25,3 +25,4 @@ include(external/glm.cmake)
 
 add_subdirectory(core)
 add_subdirectory(assignments/assignment3)
+add_subdirectory(assignments/assignment5)

@@ -22,5 +22,5 @@ namespace gg {
 	FrameBuffer CreateFrameBufferDepthOnly(uint32_t width, uint32_t height);
 	FrameBuffer CreateGBuffer(uint32_t width, uint32_t height);
 	void DestroyFrameBuffer(FrameBuffer* buffer);
-	void BindFrameBuffer(FrameBuffer* buffer);
+	void BindFrameBuffer(const FrameBuffer& buffer);
 };
