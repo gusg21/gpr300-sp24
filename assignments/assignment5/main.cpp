@@ -65,6 +65,29 @@ int main() {
 	GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	printf("Framebuffer status: %d", fboStatus);
 
+    monkeyTransform.rotation = glm::rotate(monkeyTransform.rotation, deltaTime * 0.5f, glm::vec3(0.0, 1.0, 0.0));
+    Skeleton skeleton{};
+    Node* rootNode = skeleton.AddNewNode(nullptr); // root
+    Node* arms[4];
+    arms[0] = skeleton.AddNewNode(rootNode);
+    arms[0]->Position = glm::vec3(3.f, 0.f, 0.f);
+    arms[1] = skeleton.AddNewNode(arms[0]);
+    arms[1]->Position = glm::vec3(3.f, 0.f, 0.f);
+    arms[2] = skeleton.AddNewNode(arms[1]);
+    arms[2]->Position = glm::vec3(3.f, 0.f, 0.f);
+    arms[3] = skeleton.AddNewNode(arms[2]);
+    arms[3]->Position = glm::vec3(3.f, 0.f, 0.f);
+
+    Node* arms2[4];
+    arms2[0] = skeleton.AddNewNode(rootNode);
+    arms2[0]->Position = glm::vec3(0.f, 3.f, 0.f);
+    arms2[1] = skeleton.AddNewNode(arms2[0]);
+    arms2[1]->Position = glm::vec3(0.f, 3.f, 0.f);
+    arms2[2] = skeleton.AddNewNode(arms2[1]);
+    arms2[2]->Position = glm::vec3(0.f, 3.f, 0.f);
+    arms2[3] = skeleton.AddNewNode(arms2[2]);
+    arms2[3]->Position = glm::vec3(0.f, 3.f, 0.f);
+
 	shader.use();
 	shader.setInt("_MainTex", 0);
 
@@ -86,18 +109,6 @@ int main() {
 
 		glBindTextureUnit(0, brickTexture);
 
-		monkeyTransform.rotation = glm::rotate(monkeyTransform.rotation, deltaTime * 0.5f, glm::vec3(0.0, 1.0, 0.0));
-		Skeleton skeleton{};
-		Node* rootNode = skeleton.AddNewNode(nullptr); // root
-		Node* arm1 = skeleton.AddNewNode(rootNode);
-		arm1->Position = glm::vec3(1.f, 0.f, 0.f);
-		Node* arm2 = skeleton.AddNewNode(arm1);
-		arm2->Position = glm::vec3(1.f, 0.f, 0.f);
-		Node* arm3 = skeleton.AddNewNode(arm2);
-		arm3->Position = glm::vec3(1.f, 0.f, 0.f);
-		Node* arm4 = skeleton.AddNewNode(arm3);
-		arm4->Position = glm::vec3(1.f, 0.f, 0.f);
-
 		shader.use();
 		shader.setInt("_MainTex", 0);
 		shader.setMat4("_ViewProjection", camera.projectionMatrix() * camera.viewMatrix());
@@ -107,9 +118,22 @@ int main() {
 		shader.setFloat("_Material.Ks", material.Ks);
 		shader.setFloat("_Material.Shininess", material.Shininess);
 
-		for (const Node& node : skeleton.GetNodes()) {
-			shader.setMat4("_Model", skeleton.ComposeGlobalMatrix(&node));
-			monkeyModel.draw();
+        rootNode->Rotation = glm::rotate(rootNode->Rotation, 0.5f * deltaTime, glm::normalize(glm::vec3(1, 0, 1)));
+
+        for (uint32_t i = 0; i < 4; i++) {
+            arms[i]->Rotation = glm::rotate(arms[i]->Rotation, 1.0f * deltaTime, glm::vec3(0, 1, 0));
+        }
+
+        for (uint32_t i = 0; i < 4; i++) {
+            arms2[i]->Rotation = glm::rotate(arms2[i]->Rotation, 1.0f * deltaTime, glm::vec3(1, 0, 0));
+        }
+
+		for (uint32_t i = 0; i < SKELETON_MAX_SIZE; i++) {
+            Node* node = skeleton.GetNode(i);
+            if (node != nullptr) {
+                shader.setMat4("_Model", skeleton.ComposeGlobalMatrix(node));
+                monkeyModel.draw();
+            }
 		}
 
 		cameraController.move(window, &camera, deltaTime);
