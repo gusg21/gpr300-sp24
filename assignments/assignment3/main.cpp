@@ -28,7 +28,7 @@ struct Material {
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 GLFWwindow* initWindow(const char* title, int width, int height);
-void drawUI(ew::Camera* cam, ew::CameraController* camCtrl, gg::FrameBuffer* buffers);
+void drawUI(ew::Camera* cam, ew::CameraController* camCtrl, gg::FrameBuffer* buffers, const gg::FrameBuffer& shadowFb);
 void resetCamera(ew::Camera* camera, ew::CameraController* controller);
 
 // Lights defs
@@ -57,8 +57,8 @@ ew::CameraController cameraController;
 
 float float_rand(float min, float max)
 {
-	float scale = rand() / (float)RAND_MAX; /* [0, 1.0] */
-	return min + scale * (max - min);      /* [min, max] */
+	float norm = rand() / (float)RAND_MAX;
+	return min + norm * (max - min);
 }
 
 int main() {
@@ -70,13 +70,12 @@ int main() {
 	camera.aspectRatio = (float)screenWidth / screenHeight;
 	camera.fov = 60.0f; //Vertical field of view, in degrees
 
-	ew::Camera light_cam;
-	light_cam.position = glm::vec3(50.0f, 30.0f, 50.0f);
-	light_cam.target = glm::vec3(0.0f, 0.0f, 0.0f); //Look at the center of the scene
-	light_cam.aspectRatio = 1.0f;
-	light_cam.farPlane = 30.f;
-	light_cam.nearPlane = 0.f;
-	light_cam.orthographic = true;
+	shadowCamera.orthographic = true;
+	shadowCamera.target = glm::vec3(0.0f, 0.0f, 0.0f); //Look at the center of the scene
+	shadowCamera.nearPlane = 0.5;
+	shadowCamera.farPlane = 30;
+	shadowCamera.orthoHeight = 80.0;
+	shadowCamera.aspectRatio = 1.0;
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK); //Back face culling
@@ -139,6 +138,25 @@ int main() {
 		}
 
 		{
+			glBindFramebuffer(GL_FRAMEBUFFER, gb.fbo);
+			glViewport(0, 0, gb.width, gb.height);
+
+			orbShader.use();
+			orbShader.setMat4("_ViewProjection", camera.projectionMatrix() * camera.viewMatrix());
+
+			for (int i = 0; i < NUM_LIGHTS; i++)
+			{
+				glm::mat4 m = glm::mat4(1.0f);
+				m = glm::translate(m, lights[i].pos);
+				m = glm::scale(m, glm::vec3(0.5f));
+
+				orbShader.setMat4("_Model", m);
+				orbShader.setVec3("_Color", lights[i].color);
+				sphereMesh.draw();
+			}
+		}
+
+		{
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glViewport(0, 0, screenWidth, screenHeight);
 			//glClearColor(0.6f, 0.8f, 0.92f, 1.0f);
@@ -184,7 +202,7 @@ int main() {
 			{
 				glm::mat4 m = glm::mat4(1.0f);
 				m = glm::translate(m, lights[i].pos);
-				m = glm::scale(m, glm::vec3(1.0f));
+				m = glm::scale(m, glm::vec3(lights[i].radius));
 
 				orbShader.setMat4("_Model", m);
 				orbShader.setVec3("_Color", lights[i].color);
@@ -215,7 +233,7 @@ int main() {
 
 		}*/
 
-		drawUI(&camera, &cameraController, &gb);
+		drawUI(&camera, &cameraController, &gb, shadow_fb);
 
 		glfwSwapBuffers(window);
 	}
@@ -225,7 +243,7 @@ int main() {
 	printf("Shutting down...");
 }
 
-void drawUI(ew::Camera* cam, ew::CameraController* camCtrl, gg::FrameBuffer* buffers) {
+void drawUI(ew::Camera* cam, ew::CameraController* camCtrl, gg::FrameBuffer* buffers, const gg::FrameBuffer& shadowFb) {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui::NewFrame();
@@ -240,20 +258,25 @@ void drawUI(ew::Camera* cam, ew::CameraController* camCtrl, gg::FrameBuffer* buf
 		ImGui::SliderFloat("SpecularK", &material.Ks, 0.0f, 1.0f);
 		ImGui::SliderFloat("Shininess", &material.Shininess, 2.0f, 1024.0f);
 	}
-	if (ImGui::CollapsingHeader("Effect")) {
+	/*if (ImGui::CollapsingHeader("Effect")) {
 		ImGui::SliderFloat("DOF Intensity", &dofIntensity, 0.0f, 500.0f);
 		ImGui::SliderFloat("DOF Offset", &dofOffset, 0.0f, 1.0f);
 		ImGui::SliderFloat("DOF Blur", &dofBlur, 0.0f, 50.0f);
 		ImGui::SliderFloat("Fog Power", &fogPower, 1.0f, 1000.f);
-	}
+	}*/
 
 	//Add more camera settings here!
 	ImGui::End();
 
-	ImGui::Begin("Shadow Map");
-	//Using a Child allow to fill all the space of the window.
-	ImGui::BeginChild("Shadow Map");
+	ImGui::Begin("ShadowMap");
+	ImGui::BeginChild("ShadowMap");
+	ImVec2 windowSize = ImGui::GetWindowSize();
+	ImGui::Image((ImTextureID)shadowFb.depthBuffer, windowSize, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::EndChild();
+	ImGui::End();
 	
+	ImGui::Begin("GBuffers");
+	ImGui::BeginChild("GBuffers");
 	ImVec2 texSize = ImVec2(buffers->width / 4, buffers->height / 4);
 	for (size_t i = 0; i < 3; i++)
 	{

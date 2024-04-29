@@ -15,7 +15,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/assets/
 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/)
 
 install(FILES ${ASSIGNMENT3_INC} DESTINATION include/assignment3)
-add_executable(assignment3 ${ASSIGNMENT3_SRC} ${ASSIGNMENT3_INC})
+add_executable(assignment3 ${ASSIGNMENT3_SRC} ${ASSIGNMENT3_INC} "main.cpp" "world.cpp" "world.h")
 target_link_libraries(assignment3 PUBLIC core IMGUI assimp)
 target_include_directories(assignment3 PUBLIC ${CORE_INC_DIR} ${stb_INCLUDE_DIR})
 
