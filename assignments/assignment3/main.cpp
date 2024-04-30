@@ -131,7 +131,7 @@ int main() {
 
 			//glCullFace(GL_FRONT);
 
-			shadowCamera.position = -lightDirection;
+			shadowCamera.position = shadowCamera.target - lightDirection * 5.0f;
 			world->draw(shadowShader, shadowCamera);
 
 			//glCullFace(GL_BACK);
@@ -163,7 +163,7 @@ int main() {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			deferredShader.use();
-			deferredShader.setMat4("_LightViewProjection", shadowCamera.projectionMatrix() * shadowCamera.viewMatrix());
+			deferredShader.setMat4("_LightViewProj", shadowCamera.projectionMatrix() * shadowCamera.viewMatrix());
 			deferredShader.setVec3("_EyePos", camera.position);
 			deferredShader.setVec3("_LightDirection", glm::normalize(lightDirection));
 			deferredShader.setVec3("_LightColor", glm::vec3(1.f));
@@ -172,6 +172,8 @@ int main() {
 			deferredShader.setFloat("_Material.Kd", material.Kd);
 			deferredShader.setFloat("_Material.Ks", material.Ks);
 			deferredShader.setFloat("_Material.Shininess", material.Shininess);
+			deferredShader.setFloat("_MinBias", 0.005);
+			deferredShader.setFloat("_MaxBias", 0.015);
 
 			for (int i = 0; i < NUM_LIGHTS; i++)
 			{
@@ -186,7 +188,7 @@ int main() {
 			glBindTextureUnit(3, shadow_fb.depthBuffer);
 
 			glBindVertexArray(dummyVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 3);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 
 		{
@@ -202,7 +204,7 @@ int main() {
 			{
 				glm::mat4 m = glm::mat4(1.0f);
 				m = glm::translate(m, lights[i].pos);
-				m = glm::scale(m, glm::vec3(lights[i].radius));
+				m = glm::scale(m, glm::vec3(lights[i].radius / 5.0f));
 
 				orbShader.setMat4("_Model", m);
 				orbShader.setVec3("_Color", lights[i].color);
